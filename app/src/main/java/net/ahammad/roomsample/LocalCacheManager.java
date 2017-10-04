@@ -19,6 +19,7 @@ import io.reactivex.schedulers.Schedulers;
  * Created by alahammad on 10/4/17.
  */
 
+
 public class LocalCacheManager {
     private static final String DB_NAME = "database-name";
     private Context context;
