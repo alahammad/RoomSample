@@ -37,6 +37,8 @@ public class MainActivity extends AppCompatActivity implements DatabaseCallback 
     public void add(View view) {
         if (!TextUtils.isEmpty(firstName.getText().toString()) && !TextUtils.isEmpty(lastName.getText().toString())) {
             LocalCacheManager.getInstance(this).addUser(this, firstName.getText().toString(), lastName.getText().toString());
+            firstName.setText("");
+            lastName.setText("");
         }
     }
 
