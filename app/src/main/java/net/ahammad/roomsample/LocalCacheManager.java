@@ -23,7 +23,7 @@ import io.reactivex.schedulers.Schedulers;
 public class LocalCacheManager {
     private static final String DB_NAME = "database-name";
     private Context context;
-    static LocalCacheManager _instance;
+    private static LocalCacheManager _instance;
 
     public static LocalCacheManager getInstance(Context context) {
         if (_instance == null) {
@@ -38,12 +38,11 @@ public class LocalCacheManager {
 
     public void getUsers(final DatabaseCallback databaseCallback) {
         AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, DB_NAME).build();
-        db.userDao().getAll().subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<User>>() {
+        db.userDao().getAll().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<User>>() {
             @Override
             public void accept(@io.reactivex.annotations.NonNull List<User> users) throws Exception {
-                if (users != null) {
-                    databaseCallback.onUsersLoaded(users);
-                }
+                databaseCallback.onUsersLoaded(users);
+
             }
         });
     }
@@ -57,7 +56,7 @@ public class LocalCacheManager {
                         AppDatabase.class, DB_NAME).build();
                 db.userDao().insertAll(user);
             }
-        }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+        }).observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io()).subscribe(new CompletableObserver() {
             @Override
             public void onSubscribe(Disposable d) {
@@ -82,7 +81,7 @@ public class LocalCacheManager {
                 AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, DB_NAME).build();
                 db.userDao().delete(user);
             }
-        }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
             @Override
             public void onSubscribe(Disposable d) {
 
@@ -101,7 +100,7 @@ public class LocalCacheManager {
     }
 
 
-    public void updateUser(final DatabaseCallback databaseCallback, final User user){
+    public void updateUser(final DatabaseCallback databaseCallback, final User user) {
         user.setFirstName("first name first name");
         user.setLastName("last name last name");
         Completable.fromAction(new Action() {
@@ -110,7 +109,7 @@ public class LocalCacheManager {
                 AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, DB_NAME).build();
                 db.userDao().updateUsers(user);
             }
-        }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
             @Override
             public void onSubscribe(Disposable d) {
 
