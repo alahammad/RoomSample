@@ -24,6 +24,7 @@ public class LocalCacheManager {
     private static final String DB_NAME = "database-name";
     private Context context;
     private static LocalCacheManager _instance;
+    private AppDatabase db;
 
     public static LocalCacheManager getInstance(Context context) {
         if (_instance == null) {
@@ -34,10 +35,10 @@ public class LocalCacheManager {
 
     public LocalCacheManager(Context context) {
         this.context = context;
+        db = Room.databaseBuilder(context, AppDatabase.class, DB_NAME).build();
     }
 
     public void getUsers(final DatabaseCallback databaseCallback) {
-        AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, DB_NAME).build();
         db.userDao().getAll().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<User>>() {
             @Override
             public void accept(@io.reactivex.annotations.NonNull List<User> users) throws Exception {
@@ -52,8 +53,6 @@ public class LocalCacheManager {
             @Override
             public void run() throws Exception {
                 User user = new User(firstName, lastName);
-                AppDatabase db = Room.databaseBuilder(context,
-                        AppDatabase.class, DB_NAME).build();
                 db.userDao().insertAll(user);
             }
         }).observeOn(AndroidSchedulers.mainThread())
@@ -78,7 +77,6 @@ public class LocalCacheManager {
         Completable.fromAction(new Action() {
             @Override
             public void run() throws Exception {
-                AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, DB_NAME).build();
                 db.userDao().delete(user);
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
@@ -106,7 +104,6 @@ public class LocalCacheManager {
         Completable.fromAction(new Action() {
             @Override
             public void run() throws Exception {
-                AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, DB_NAME).build();
                 db.userDao().updateUsers(user);
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
